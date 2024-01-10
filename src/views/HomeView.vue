@@ -4,6 +4,9 @@ import DefaultLayout from '@/components/layouts/DefaultLayout.vue'
 
 <template>
  <DefaultLayout>
+    <template #article>
+        
+    </template>
     
     <template #aside> 
 
