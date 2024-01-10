@@ -4,7 +4,7 @@
 
 <template>
     <section class="Layout__Aside">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Exercitationem similique expedita tempore dolores voluptatibus. Nobis temporibus magni hic quaerat labore facere laborum officiis sunt magnam laudantium! Ducimus dolorem in tempore!
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Officiis saepe cupiditate iure suscipit vero vel, corporis deleniti omnis repellendus rem accusantium optio totam nemo ut ratione eligendi. Ut, deserunt sapiente?
     </section>
 </template>
 
@@ -13,5 +13,6 @@
     background: $black;
     height: 100%;
     color: $white;
+    border: 3px solid $secondary-color;  
 }
 </style>
