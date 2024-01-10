@@ -1,0 +1,22 @@
+@import 'functions';
+
+$primary-color: #262222;
+$secondary-color: #f5ddc4;
+
+$white: #fff;
+$gray: #b6b6b6;
+$black: #000;
+
+$small-font-size: rem(13);
+$regular-font-size: rem(18);
+$medium-font-size: rem(20);
+$big-font-size: rem(26);
+$bigger-font-size: rem(32);
+$giant-font-size: rem(36);
+
+$primary-font-familly: Poppins, Sans-Serif;
+
+// media queries
+$small: 600px;
+$medium: 760px;
+$large: 960px;
