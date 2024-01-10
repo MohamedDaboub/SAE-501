@@ -69,11 +69,12 @@
   }
 
   > * {
-    padding: rem(16);
+    padding: rem(0);
   }
 
   &__article {
     grid-area: article;
+    width: 100%;
   }
 
   &__aside {
@@ -84,7 +85,6 @@
     background: $primary-color;
     grid-area: footer;
     color: $white;
-    border-top: 2px solid $white ;
  
 
     &__logo {
@@ -140,7 +140,6 @@
     justify-content: space-between;
     align-items: center;
     padding: rem(0) rem(20); 
-    border-bottom: 2px solid $white ;
 
     &__logo {
       img {
