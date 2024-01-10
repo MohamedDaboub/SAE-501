@@ -34,13 +34,14 @@ const initScene = () => {
     pointLight.position.set(0, 1, 0);
     scene.add(pointLight);
 
-    // Add a plane
+
     const planeSize = 10;
     const planeGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
+    const texture = new THREE.TextureLoader().load('/models/Texture/Bois.jpg');
+    const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -1; 
+    plane.position.y = -0.5;
     scene.add(plane);
 
     clock.start();
