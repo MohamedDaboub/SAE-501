@@ -23,16 +23,26 @@ const initScene = () => {
     renderer.setClearColor(0x222222, 1);
     
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
+    controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
-    controls.maxPolarAngle = Math.PI / 2; 
-    controls.minDistance = 0.15;
+    controls.maxPolarAngle = Math.PI / 2; // don't allow the camera to go below the ground plane
+    controls.minDistance = 0.18;
     controls.maxDistance = 0.3;
 
     var pointLight = new THREE.PointLight(0xffffff, 1);
     pointLight.position.set(0, 1, 0);
     scene.add(pointLight);
+
+    // Add a plane
+    const planeSize = 10;
+    const planeGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
+    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xaaaaaa, side: THREE.DoubleSide });
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.y = -1; 
+    scene.add(plane);
+
     clock.start();
     var loader = new ColladaLoader();
     loader.load('/models/montre.dae', onLoaded, onProgress, onError);
@@ -45,7 +55,7 @@ const updateRendererSize = () => {
 const animate = () => {
     let dt = clock.getDelta();
     animationId = requestAnimationFrame(animate);
-    controls.update(); 
+    controls.update();
     renderer.render(scene, camera);
 };
 
