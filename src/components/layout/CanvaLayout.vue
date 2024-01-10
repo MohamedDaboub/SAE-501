@@ -43,6 +43,25 @@ const initScene = () => {
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = -0.5;
     scene.add(plane);
+    
+    const sidePlaneGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
+    const sidePlane1 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
+    sidePlane1.rotation.y = -Math.PI / 2;
+    sidePlane1.position.x = -planeSize / 2;
+    scene.add(sidePlane1);
+
+    const sidePlane2 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
+    sidePlane2.rotation.y = Math.PI / 2;
+    sidePlane2.position.x = planeSize / 2;
+    scene.add(sidePlane2);
+
+    const sidePlane3 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
+    sidePlane3.position.z = -planeSize / 2;
+    scene.add(sidePlane3);
+
+    const sidePlane4 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
+    sidePlane4.position.z = planeSize / 2;
+    scene.add(sidePlane4);
 
     clock.start();
     var loader = new ColladaLoader();
