@@ -16,51 +16,65 @@ var height, width;
 
 const initScene = () => {
     scene = new THREE.Scene();
+    
+    // Adjust ambient light for a darker scene
+    const ambientLight = new THREE.AmbientLight(0x404040); // Dark gray
+    scene.add(ambientLight);
+
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.z = 1;
+    camera.position.z = 0.5;
+    camera.position.y = 2;
+
     renderer = new THREE.WebGLRenderer({ canvas: canvas.value });
     updateRendererSize();
     renderer.setClearColor(0x222222, 1);
-    
+    renderer.shadowMap.enabled = true;
+
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+    controls.enableDamping = true;
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
-    controls.maxPolarAngle = Math.PI / 2; // don't allow the camera to go below the ground plane
+    controls.maxPolarAngle = Math.PI / 2;
     controls.minDistance = 0.18;
-    controls.maxDistance = 0.3;
+    controls.maxDistance = 0.25;
 
-    var pointLight = new THREE.PointLight(0xffffff, 1);
+    // Adjust point light intensity for shadow darkness
+    var pointLight = new THREE.PointLight(0xffffff, 0.5); // Lower intensity for a darker scene
     pointLight.position.set(0, 1, 0);
+    pointLight.castShadow = true;
     scene.add(pointLight);
 
-
-    const planeSize = 10;
+    const planeSize = 2;
     const planeGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
     const texture = new THREE.TextureLoader().load('/models/Texture/Bois.jpg');
     const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
     plane.position.y = -0.5;
+    plane.castShadow = true;
     scene.add(plane);
-    
+
     const sidePlaneGeometry = new THREE.PlaneGeometry(planeSize, planeSize);
     const sidePlane1 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
     sidePlane1.rotation.y = -Math.PI / 2;
     sidePlane1.position.x = -planeSize / 2;
+    sidePlane1.castShadow = true;
     scene.add(sidePlane1);
 
     const sidePlane2 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
     sidePlane2.rotation.y = Math.PI / 2;
     sidePlane2.position.x = planeSize / 2;
+    sidePlane2.castShadow = true;
     scene.add(sidePlane2);
 
     const sidePlane3 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
     sidePlane3.position.z = -planeSize / 2;
+    sidePlane3.castShadow = true;
     scene.add(sidePlane3);
 
     const sidePlane4 = new THREE.Mesh(sidePlaneGeometry, planeMaterial);
     sidePlane4.position.z = planeSize / 2;
+    sidePlane4.castShadow = true;
     scene.add(sidePlane4);
 
     clock.start();
