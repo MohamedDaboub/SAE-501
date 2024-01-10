@@ -1,7 +1,7 @@
 <script setup>
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, toRefs,onUpdated } from 'vue';
 import * as THREE from 'three';
 
 const canvas = ref(null);
@@ -18,11 +18,19 @@ let aiguilleHeures = null;
 let aiguilleMinutes = null;
 let aiguilleSecondes = null;
 
+const props = defineProps({
+    boitier_rond :Boolean,
+    boitier_image_url: String,
+    bracelet_image_url : String,
+});
+
+const Montres = toRefs(props);
+
 const initScene = () => {
     scene = new THREE.Scene();
     
     // Adjust ambient light for a darker scene
-    const ambientLight = new THREE.AmbientLight(0x404040); // Dark gray
+    const ambientLight = new THREE.AmbientLight(0xf0f0f0); // Dark gray
     scene.add(ambientLight);
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
@@ -39,10 +47,9 @@ const initScene = () => {
     controls.dampingFactor = 0.25;
     controls.screenSpacePanning = false;
     controls.maxPolarAngle = Math.PI / 2;
-    controls.minDistance = 0.18;
-    controls.maxDistance = 0.25;
+    controls.minDistance = 0.16;
+    controls.maxDistance = 0.20;
 
-    // Adjust point light intensity for shadow darkness
     var pointLight = new THREE.PointLight(0xffffff, 0.5); // Lower intensity for a darker scene
     pointLight.position.set(0, 1, 0);
     pointLight.castShadow = true;
@@ -122,7 +129,10 @@ const animate = () => {
 
 function onLoaded(collada) {
     let objects = collada.scene;
-    // Recherchez les aiguilles dans les objets
+    
+    boitier_carre= objects.getObjectByName("boitier_carre");
+    boitier_round= objects.getObjectByName("boitier_round");
+    
     objects.traverse((child) => {
         if (child.name === "aiguille_heures") {
             aiguilleHeures = child;
@@ -175,6 +185,10 @@ onMounted(() => {
     saveCameraPosition();
 });
 
+onUpdated(()=>{
+    initScene();
+})
+
 onBeforeUnmount(() => {
     cancelAnimationFrame(animationId);
     window.removeEventListener('resize', onResize);
@@ -184,14 +198,35 @@ onBeforeUnmount(() => {
 <template>
     <div ref="test" >
         <canvas class="canvas" ref="canvas" />
+        <h1>{{ boitier_image_url }}</h1>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .canvas {
-    width: 100%;
-    height: 30rem;
+    width: 80%;
+    height: 25rem;
     margin: 0;
-    border: 3px solid $secondary-color;  
+    border: 0px solid $secondary-color;  
+}
+.Layout__Aside{
+    background: $black;
+    height: 100%;
+    color: $white;
+    border-left: 3px solid $white; 
+    font-family: $primary-font-familly; 
+
+    &__Titre{
+        font-size: $big-font-size;
+        font-weight: 700;
+        text-align: center;
+        padding: 1rem;
+    }
+    &__Texte{
+        font-size: $medium-font-size;
+        font-weight: 400;
+        text-align: center;
+        padding: 1rem;
+    }
 }
 </style>
