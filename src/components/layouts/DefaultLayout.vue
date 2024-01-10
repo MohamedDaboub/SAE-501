@@ -26,14 +26,9 @@
     </div>
   </slot>
 </header>
-    <aside class="layout__aside">
-      <slot name="aside">
-        <AsideLayout/>
-      </slot>
-    </aside>
     <article class="layout__article">
       <slot>
-        <CanvasLayout/>
+        <AsideLayout/>
       </slot>
     </article>
     <footer class="layout__footer">
@@ -64,16 +59,17 @@
   @include medium-up {
     grid-template:
       'header header header'
-      'article article aside'
+      'article article article'
       'footer footer footer';
   }
 
   > * {
-    padding: rem(16);
+    padding: rem(0);
   }
 
   &__article {
     grid-area: article;
+    width: 100%;
   }
 
   &__aside {
@@ -84,7 +80,6 @@
     background: $primary-color;
     grid-area: footer;
     color: $white;
-    border-top: 2px solid $white ;
  
 
     &__logo {
@@ -140,7 +135,7 @@
     justify-content: space-between;
     align-items: center;
     padding: rem(0) rem(20); 
-    border-bottom: 2px solid $white ;
+    border-bottom: 1px solid $white ;
 
     &__logo {
       img {
@@ -187,6 +182,5 @@
 <script setup>
 import MyIcon from '@/components/elements/MyIcon.vue'
 import AsideLayout from '@/components/layout/AsideLayout.vue'
-import CanvasLayout from '@/components/layout/CanvaLayout.vue'
 
 </script>
