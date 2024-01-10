@@ -21,7 +21,15 @@ const initScene = () => {
     renderer = new THREE.WebGLRenderer({ canvas: canvas.value });
     updateRendererSize();
     renderer.setClearColor(0x222222, 1);
+    
     controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.screenSpacePanning = false;
+    controls.maxPolarAngle = Math.PI / 2; 
+    controls.minDistance = 0.15;
+    controls.maxDistance = 0.3;
+
     var pointLight = new THREE.PointLight(0xffffff, 1);
     pointLight.position.set(0, 1, 0);
     scene.add(pointLight);
@@ -37,6 +45,7 @@ const updateRendererSize = () => {
 const animate = () => {
     let dt = clock.getDelta();
     animationId = requestAnimationFrame(animate);
+    controls.update(); 
     renderer.render(scene, camera);
 };
 
@@ -70,6 +79,11 @@ const onResize = () => {
     updateRendererSize();
 };
 
+const saveCameraPosition = () => {
+    const { x, y, z } = camera.position;
+    localStorage.setItem('cameraPosition', JSON.stringify({ x, y, z }));
+};
+
 onMounted(() => {
     width = test.value.clientWidth;
     height = test.value.clientHeight;
@@ -77,6 +91,7 @@ onMounted(() => {
     animate();
     window.addEventListener('resize', onResize);
     document.addEventListener('click', onClick);
+    saveCameraPosition();
 });
 
 onBeforeUnmount(() => {
@@ -85,7 +100,6 @@ onBeforeUnmount(() => {
     document.removeEventListener('click', onClick);
 });
 </script>
-
 <template>
     <div ref="test" >
         <canvas class="canvas" ref="canvas" />
