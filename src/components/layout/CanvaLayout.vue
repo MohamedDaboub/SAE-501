@@ -14,6 +14,10 @@ let renderer = null;
 let animationId = null;
 var height, width;
 
+let aiguilleHeures = null;
+let aiguilleMinutes = null;
+let aiguilleSecondes = null;
+
 const initScene = () => {
     scene = new THREE.Scene();
     
@@ -85,16 +89,49 @@ const initScene = () => {
 const updateRendererSize = () => {
     renderer.setSize(width, height);
 };
+const updateClockHands = () => {
+    const now = new Date();
+    const hours = now.getHours() % 12; // Modulo 12 pour convertir les heures en format 12 heures
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Mettez à jour les rotations des aiguilles
+    if (aiguilleHeures) {
+        const hoursRotation = (hours + minutes / 60) * (Math.PI / 6); // 30 degrés par heure, 0.5 degré par minute
+        aiguilleHeures.rotation.z = -hoursRotation;
+    }
+
+    if (aiguilleMinutes) {
+        const minutesRotation = minutes * (Math.PI / 30); // 6 degrés par minute
+        aiguilleMinutes.rotation.z = -minutesRotation;
+    }
+
+    if (aiguilleSecondes) {
+        const secondsRotation = seconds * (Math.PI / 30); // 6 degrés par seconde
+        aiguilleSecondes.rotation.z = -secondsRotation;
+    }
+};
 
 const animate = () => {
     let dt = clock.getDelta();
     animationId = requestAnimationFrame(animate);
     controls.update();
+    updateClockHands(); // Appel de la fonction pour mettre à jour les aiguilles
     renderer.render(scene, camera);
 };
 
 function onLoaded(collada) {
     let objects = collada.scene;
+    // Recherchez les aiguilles dans les objets
+    objects.traverse((child) => {
+        if (child.name === "aiguille_heures") {
+            aiguilleHeures = child;
+        } else if (child.name === "aiguille_minutes") {
+            aiguilleMinutes = child;
+        } else if (child.name === "aiguille_secondes") {
+            aiguilleSecondes = child;
+        }
+    });
     scene.add(objects);
     let dt = clock.getElapsedTime();
     console.log("Loading completed after " + dt + " s.");
