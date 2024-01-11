@@ -1,80 +1,143 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import {instance } from "@/utils/axios";
-import {getboitiers} from "@/utils/Donne.js";
+// import {instance } from "@/utils/axios";
+import {getboitiers,getPierres,getbracelet } from "@/utils/Donne.js";
 import CanvasLayout from '@/components/layout/CanvaLayout.vue'
 const getboitier = ref();
+const getPierre = ref();
+const getBracelets = ref();
 
 const nouveauMontre = ref(({
-    Nom_Montre:"",
-    id_boitier:"",
-    id_pierres:"",
-    id_bracelet:"",
+    id_boitier:"background_fluo01.png",
+    id_pierres:"Aigue-marine",
+    id_bracelet:"texture-tissus-or.jpg",
+    Boitiers_Form:"rond",
 }))
-const getMontres = async () => {
-  const reponse = await instance.get("/Montres");
-  return reponse.data;
-};
-console.log(getMontres());
-const montres = ref();
 onMounted(async () => {
-  montres.value = await getMontres();
-  console.log(montres.value);
   getboitier.value = await getboitiers();
+  getPierre.value = await getPierres();
+  getBracelets.value = await getbracelet();
+
 });
 
 
 </script>
 
 <template>
-    <section class="Layout__Aside">    
-    <h2 class="Layout__Aside__Titre">Configurez votre montre</h2>
-    <p  class="Layout__Aside__Texte">Vous avec les choise de Configure votre montre comme vous le suite avec les choiuse suivant  </p>
-    <div>
-        <div>
-            <h3>Cadren</h3>
-            <p>Choisisez l'image de votre Cadren</p>
-            <form action="">
-                <select name="boit" required multiple v-model="nouveauMontre.id_boitier"   >
-                    <option v-for="(boitier,index) in getboitier " :key="index"  :label=boitier.nom_boitier value=""></option>
-                </select>
-                <select multiple>
-                    <option value="">uobgihyj n</option>
-                    <option value="">uobgihyj n</option>
-                    <option value="">uobgihyj n</option>
-                </select>
-                <p v-for="(boitier,index) in getboitier " :key="index">{{ boitier }}</p>
-            </form>
-        </div>
+    <section class="Layout">
+    <div class="Layout__Canvas">
+      <CanvasLayout :boitier_image_url="nouveauMontre.id_boitier" :bracelet_image_url="nouveauMontre.id_bracelet" :Boitiers_Form="nouveauMontre.Boitiers_Form"/>
     </div>
-        <div>
-            <button>
-                <router-link to="/about">Commencer</router-link>
-            </button>
-        </div>
-        <CanvasLayout  :boitier_rond="nouveauMontre.id_boitier" :boitier_image_url="nouveauMontre.id_boitier"/>
-    </section>
+    <div class="Layout__Config">
+      <h2 class="Layout__Config__Title">Configurez votre montre</h2>
+      <p class="Layout__Config__Text">Vous avez le choix de configurer votre montre avec les options suivantes</p>
+        <form action="">
+            <div>
+                <label for="boit">Choisisez l'image de votre cadran</label>
+                <select  name="boit" required v-model="nouveauMontre.id_boitier"   >
+                    <option v-for="(boitier,index) in getboitier " :key="index"  :label="boitier.nom_boitier  " :value="boitier.boitier_image_url"></option>
+                </select>
+            </div>
+            <div>
+                <label for="pierre">Choisisez l'image de votre cadran</label>
+                <select name="pierre" v-model="nouveauMontre.id_pierres" id="">
+                    <option v-for="(pierre,index) in getPierre " :key="index" :label=pierre.nom_pierres  :value="pierre.nom_pierres"></option>
+                </select>
+            </div>
+            <div>
+                <label for="bracelet">Choisisez l'image de votre cadran</label>
+                <select name="bracelet" v-model="nouveauMontre.id_bracelet" id="">
+                    <option v-for="(bracelet,index) in getBracelets " :key="index" :label=bracelet.nom_bracelet  :value="bracelet.bracelet_image_url"></option>
+                </select>
+            </div>
+            <div>
+                <label for="typeBoitier">Choisisez l'image de votre cadran</label>
+                <select name="typeBoitier" id="typeBoitier" v-model="nouveauMontre.Boitiers_Form">
+                    <option value="rond" selected>Rond</option>
+                    <option value="carré">Carré</option>
+                </select>
+            </div>
+        </form>
+    </div>
+  </section>
 </template>
 
 <style lang="scss" scoped>
-.Layout__Aside{
+.Layout {
+  display: flex;
+  height: 100%;
+  
+  &__Canvas {
+    flex: 2; /* 75% */
     background: $black;
-    height: 100%;
-    color: $white;
-    border-left: 3px solid $white; 
-    font-family: $primary-font-familly; 
+    border-right: 3px solid $white;
+  }
 
-    &__Titre{
-        font-size: $big-font-size;
-        font-weight: 700;
-        text-align: center;
-        padding: 1rem;
+  &__Config {
+    flex: 1; /* 25% */
+    background: $secondary-color;
+    color: $white;
+    font-family: $primary-font-familly;
+    &__Title {
+      font-size: $big-font-size;
+      font-weight: 700;
+      text-align: center;
+      padding: 1rem;
     }
-    &__Texte{
-        font-size: $medium-font-size;
-        font-weight: 400;
-        text-align: center;
-        padding: 1rem;
+
+    &__Text {
+      font-size: $medium-font-size;
+      font-weight: 400;
+      text-align: center;
+      padding: 1rem;
     }
+  }
+}
+form {
+  margin-top: 1.5rem;
+  padding: rem(16);
+
+  div {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      font-size: $medium-font-size;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    select {
+      width: 100%;
+      padding: rem(10);
+      font-size: $medium-font-size;
+      border: 1px solid $black;
+      background-color: $white;
+      border-radius: rem(3);
+      transition: border-color 0.3s ease;
+
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+      }
+    }
+  }
+
+  button {
+    padding: 1rem 2rem;
+    font-size: $medium-font-size;
+    font-weight: 700;
+    background-color: $primary-color;
+    color: $white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+    }
+  }
 }
 </style>
