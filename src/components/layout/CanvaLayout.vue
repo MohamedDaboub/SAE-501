@@ -17,9 +17,16 @@ var height, width;
 let aiguilleHeures = null;
 let aiguilleMinutes = null;
 let aiguilleSecondes = null;
+let textureBackground = null;
+let textureBarcet = null;
+let boitier_round = null;
+let boitier_carre = null;
+let bracelet = null;
+let pierre = null;
+let pierre1 = null;
 
 const props = defineProps({
-    boitier_rond :Boolean,
+    Boitiers_Form :String,
     boitier_image_url: String,
     bracelet_image_url : String,
 });
@@ -34,8 +41,8 @@ const initScene = () => {
     scene.add(ambientLight);
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.z = 0.5;
-    camera.position.y = 2;
+    camera.position.z = 0.2;
+    camera.position.y = 200;
 
     renderer = new THREE.WebGLRenderer({ canvas: canvas.value });
     updateRendererSize();
@@ -129,10 +136,29 @@ const animate = () => {
 
 function onLoaded(collada) {
     let objects = collada.scene;
-    
     boitier_carre= objects.getObjectByName("boitier_carre");
-    boitier_round= objects.getObjectByName("boitier_round");
-    
+    boitier_round= objects.getObjectByName("boitier_rond");
+    bracelet = objects.getObjectByName("bracelet");
+    pierre = objects.getObjectByName("pierre");
+
+    textureBackground =  new THREE.TextureLoader().load(`/models/Texture/${Montres.boitier_image_url.value}`);
+    textureBarcet =  new THREE.TextureLoader().load(`/models/Texture/${Montres.bracelet_image_url.value}`);
+    boitier_round.material[1].map = textureBackground;
+    boitier_carre.material[1].map = textureBackground;
+    bracelet.material.map = textureBarcet;
+    if (Montres.Boitiers_Form.value == "rond") {
+        boitier_carre.visible = false;
+        boitier_round.visible = true;
+    } else if (Montres.Boitiers_Form.value == "carré") {
+        boitier_carre.visible = true;
+        boitier_round.visible = false;
+    }    
+
+    // répité l
+
+
+
+
     objects.traverse((child) => {
         if (child.name === "aiguille_heures") {
             aiguilleHeures = child;
@@ -159,7 +185,7 @@ var onError = function (data) {
 };
 
 const onClick = () => {
-    console.log('document cliqué');
+    // console.log('document cliqué');
 };
 
 const onResize = () => {
@@ -198,14 +224,14 @@ onBeforeUnmount(() => {
 <template>
     <div ref="test" >
         <canvas class="canvas" ref="canvas" />
-        <h1>{{ boitier_image_url }}</h1>
+        <!-- <h1>{{ boitier_image_url }}</h1> -->
     </div>
 </template>
 
 <style lang="scss" scoped>
 .canvas {
-    width: 80%;
-    height: 25rem;
+    width: 100%;
+    height: 100%;
     margin: 0;
     border: 0px solid $secondary-color;  
 }
