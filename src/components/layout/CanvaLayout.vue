@@ -18,13 +18,13 @@ let aiguilleHeures = null;
 let aiguilleMinutes = null;
 let aiguilleSecondes = null;
 
-const props = defineProps({
-    boitier_rond :Boolean,
-    boitier_image_url: String,
-    bracelet_image_url : String,
-});
+// const props = defineProps({
+//     boitier_rond :Boolean,
+//     boitier_image_url: String,
+//     bracelet_image_url : String,
+// });
 
-const Montres = toRefs(props);
+// const Montres = toRefs(props);
 
 const initScene = () => {
     scene = new THREE.Scene();
@@ -130,8 +130,8 @@ const animate = () => {
 function onLoaded(collada) {
     let objects = collada.scene;
     
-    boitier_carre= objects.getObjectByName("boitier_carre");
-    boitier_round= objects.getObjectByName("boitier_round");
+    // boitier_carre= objects.getObjectByName("boitier_carre");
+    // boitier_round= objects.getObjectByName("boitier_round");
     
     objects.traverse((child) => {
         if (child.name === "aiguille_heures") {
