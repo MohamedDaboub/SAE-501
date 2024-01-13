@@ -3,7 +3,15 @@ import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
 import MyCard from '@/components/elements/MyCard.vue'
 import { instance } from '@/utils/axios'
 import {getboitiers,getPierres,getbracelet } from "@/utils/Donne.js";
-import { ref, onMounted } from "vue";
+import { ref, onMounted,watchEffect  } from "vue";
+
+const budgetMin = ref(0);
+const budgetMax = ref(300);
+const montres = ref([]);
+const currentPage = ref(1);
+const cardsPerPage = 6;
+const filteredMontres = ref();
+
 const getboitier = ref();
 const getPierre = ref();
 const getBracelets = ref();
@@ -12,24 +20,11 @@ const getMontres = async () => {
   const response = await instance.get(`/Montres/Utilisateurs/${userId}`);
   return response.data;
 }
-
-const montres = ref([]);
-const currentPage = ref(1);
-const cardsPerPage = 6;
-
 const getCardRange = () => {
   const startIndex = (currentPage.value - 1) * cardsPerPage;
   const endIndex = startIndex + cardsPerPage;
   return { startIndex, endIndex };
 };
-
-onMounted(async () => {
-  montres.value = await getMontres();
-  getboitier.value = await getboitiers();
-  getPierre.value = await getPierres();
-  getBracelets.value = await getbracelet();
-})
-
 const getBraceletTexture = (idBracelet) => {
   switch (idBracelet) {
     case 'texture-tissus-or.jpg':
@@ -38,7 +33,6 @@ const getBraceletTexture = (idBracelet) => {
       return 'Tissus marron';
     case 'texture-cuir-blanc.jpg':
       return 'Cuir blanc';
-    // Ajoute d'autres cas au besoin
     default:
       return 'Texture inconnue';
   }
@@ -63,7 +57,6 @@ const getBoitierName = (idBoitier) => {
       return 'white04';
     case 'background_white05.png':
       return 'white05';
-    // Ajoute d'autres cas au besoin
     default:
       return 'Boîtier inconnu';
   }
@@ -74,11 +67,29 @@ const getBoitierFormName = (boitierForm) => {
       return 'Round';
     case 'carré':
       return 'Carré';
-    // Ajoute d'autres cas au besoin
     default:
       return 'Forme inconnue';
   }
 };
+const applyFilters = () => {
+  return montres.value.filter((montre) => {
+    const withinBudget = montre.Prix_unitaire >= budgetMin.value && montre.Prix_unitaire <= budgetMax.value;
+    return withinBudget;
+  });
+};
+const updateFilteredMontres = () => {
+  filteredMontres.value = applyFilters();
+};
+onMounted(async () => {
+  montres.value = await getMontres();
+  getboitier.value = await getboitiers();
+  getPierre.value = await getPierres();
+  getBracelets.value = await getbracelet();
+  updateFilteredMontres();
+});
+watchEffect(() => {
+  updateFilteredMontres();
+});
 </script>
 
 <template>
@@ -88,8 +99,19 @@ const getBoitierFormName = (boitierForm) => {
         <h1 class="C-inspiration__titre">Liste des Montres</h1>
         <p class="C-inspiration__texte">Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum, ullam excepturi! Neque iure earum recusandae quae repellendus iste quod et soluta, hic, eaque eveniet natus ipsa tempora vero ex praesentium.</p>
       </div>
+      <div class="C-inspiration">
+        <h2 class="C-inspiration__titreFilter">Filtres</h2>
+        <div class="C-inspiration__titreFilter__Min">
+          <label class="C-inspiration__titreFilter__Min__label" >Budget min:</label>
+          <input class="C-inspiration__titreFilter__Min__input" type="number" v-model="budgetMin" />
+        </div>
+        <div class="C-inspiration__titreFilter__Max">
+          <label class="C-inspiration__titreFilter__Max__label">Budget max:</label>
+          <input class="C-inspiration__titreFilter__Max__input" type="number" v-model="budgetMax" />
+        </div>
+      </div>
       <div class="C-inspiration__card">
-      <div v-for="montre in montres && montres.length ? montres.slice(getCardRange().startIndex, getCardRange().endIndex) : []" :key="montre.id_montre" class="C-inspiration__card__plus"  >
+        <div v-for="montre in filteredMontres && filteredMontres.length ? filteredMontres.slice(getCardRange().startIndex, getCardRange().endIndex) : []" :key="montre.id_montre" class="C-inspiration__card__plus">
         <MyCard :boitier_image_url="montre.id_boitier" :bracelet_image_url="montre.id_bracelet" :Boitiers_Form="montre.Boitiers_Form" />
         <div class="C-inspiration__card__des">
           <p class="C-inspiration__card__des__texte">{{ getBraceletTexture(montre.id_bracelet) }}</p>
@@ -125,21 +147,56 @@ const getBoitierFormName = (boitierForm) => {
     text-align: center;
     margin-bottom: rem(30);
   }
+  &__titreFilter{
+    font-size:$big-font-size;
+    font-weight: 700;
+    text-align: start;
+    margin: rem(30);
+    &__Min {
+      margin: rem(30);
+      display: flex;
+      gap: rem(20);
+      &__label {
+      display: block;
+      font-size: 1.2em;
+      margin-bottom: 5px;
+    }
+    &__input {
+    padding: 5px;
+    width: 100px;
+  }
+
+    }
+    &__Max {
+      margin: rem(30);
+      display: flex;
+      gap: rem(20);
+      &__label {
+        display: block;
+        font-size: 1.2em;
+        margin-bottom: 5px; 
+      }
+      &__input {
+      padding: 5px;
+      width: 100px; 
+    }
+    }
+  }
   &__texte{
     font-size:$medium-font-size;
     margin: rem(30);
 
   }
   &__card{
-    // grid avec 3 colonnes
+
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: rem(30);
-    // centrer les card
+
     justify-content: center;
     margin: rem(30) rem(100);
   &__des{
-    // grid de 2
+
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: rem(30);
@@ -179,12 +236,12 @@ const getBoitierFormName = (boitierForm) => {
    font-size: 16px;
    cursor: pointer;
    background-color: $primary-color; 
-   color: #ffffff; /* Ajoutez votre couleur de texte préférée ici */
+   color: #ffffff;
    border: none;
    border-radius: 4px;
    &:disabled {
-     background-color: #bdc3c7; /* Ajoutez votre couleur de fond désactivée ici */
-     color: #7f8c8d; /* Ajoutez votre couleur de texte désactivée ici */
+     background-color: #bdc3c7;
+     color: #7f8c8d; 
      cursor: not-allowed;
    }
   }
@@ -192,7 +249,7 @@ const getBoitierFormName = (boitierForm) => {
     font-size: 18px;
     margin: rem(20);
     font-weight: bold;
-    color: #2c3e50; /* Ajoutez votre couleur de texte préférée ici */
+    color: #2c3e50;
   }
   }
 
