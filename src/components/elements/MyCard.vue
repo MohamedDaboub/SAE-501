@@ -280,20 +280,10 @@ onMounted(async () => {
   </template>
     
 <style lang="scss" scoped>
-  .Card {
-    display: flex;
-    background: $black;
-    color: $white;
-    border: 3px solid $white;
-    // border-radius: $border-radius;
-    overflow: hidden;
-    // font-family: $primary-font-family;
-    margin-bottom: 2rem;
-  
-    &__Canvas {
-      flex: 1;
-      position: relative;
-    }
+.canvas{
+    width: 100%;
+    height: 100%;
+    border-radius: rem(10) rem(10) rem(0) rem(0);
 }
   </style>
   
