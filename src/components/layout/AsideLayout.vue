@@ -1,14 +1,15 @@
 <script setup>
 import { ref, onMounted } from "vue";
-// import {instance } from "@/utils/axios";
+import {instance } from "@/utils/axios";
 import {getboitiers,getPierres,getbracelet } from "@/utils/Donne.js";
 import CanvasLayout from '@/components/layout/CanvaLayout.vue'
 const getboitier = ref();
 const getPierre = ref();
 const getBracelets = ref();
+const userId = ref()
 
 const nouveauMontre = ref(({
-    id_boitier:"background_fluo01.png",
+    id_boitier:"background_black01.png",
     id_pierres:"Aigue-marine",
     id_bracelet:"texture-tissus-or.jpg",
     Boitiers_Form:"rond",
@@ -19,6 +20,27 @@ onMounted(async () => {
   getBracelets.value = await getbracelet();
 
 });
+
+const addMontre = async()=>{
+  await instance.post('Montres/add',nouveauMontre.value);
+  nouveauMontre.value = ({
+    id_Utilisateur:userId.value,
+    id_boitier:"background_black01.png",
+    id_pierres:"Aigue-marine",
+    id_bracelet:"texture-tissus-or.jpg",
+    Boitiers_Form:"rond",
+});
+}
+if (localStorage.getItem('userId')) {
+  userId.value = localStorage.getItem('userId');
+  nouveauMontre.value = ({
+    id_Utilisateur:userId.value,
+    id_boitier:"background_black01.png",
+    id_pierres:"Aigue-marine",
+    id_bracelet:"texture-tissus-or.jpg",
+    Boitiers_Form:"rond",
+});
+}
 
 
 </script>
@@ -31,7 +53,7 @@ onMounted(async () => {
     <div class="Layout__Config">
       <h2 class="Layout__Config__Title">Configurez votre montre</h2>
       <p class="Layout__Config__Text">Vous avez le choix de configurer votre montre avec les options suivantes</p>
-        <form action="">
+        <form @submit.prevent="addMontre">
             <div>
                 <label for="boit">Choisisez l'image de votre cadran</label>
                 <select  name="boit" required v-model="nouveauMontre.id_boitier"   >
@@ -57,6 +79,7 @@ onMounted(async () => {
                     <option value="carré">Carré</option>
                 </select>
             </div>
+            <button type="submit">Ajouter</button>
         </form>
     </div>
   </section>

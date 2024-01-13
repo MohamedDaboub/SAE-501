@@ -1,11 +1,11 @@
 <script setup>
+  import { ref, onMounted, onBeforeUnmount, toRefs,onUpdated } from 'vue';  
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js';
-import { ref, onMounted, onBeforeUnmount, toRefs,onUpdated } from 'vue';
 import * as THREE from 'three';
 
 const canvas = ref(null);
-const Montre = ref(null);
+const test = ref(null);
 var controls = null;
 var clock = new THREE.Clock();
 let scene = null;
@@ -22,7 +22,7 @@ let textureBarcet = null;
 let boitier_round = null;
 let boitier_carre = null;
 let bracelet = null;
-let pierre
+let pierre = null;
 
 const props = defineProps({
     Boitiers_Form :String,
@@ -34,27 +34,10 @@ const Montres = toRefs(props);
 
 const initScene = () => {
     scene = new THREE.Scene();
-
-    renderer = new THREE.WebGLRenderer();
-    renderer.shadowMap.enabled=true; // activer la gestion des ombres
-    renderer.shadowMap.type=THREE.PCFShadowMap;
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(1, 1, 1).normalize();
-    scene.add(directionalLight);
-
-    renderer.setClearColor(0x222222,1);
-    window.addEventListener('resize', onWindowResize, false);
-
-
     // Adjust ambient light for a darker scene
-    var ambientLight = new THREE.AmbientLight(0xf0f0f0);
+    const ambientLight = new THREE.AmbientLight(0xf0f0f0); // Dark gray
     scene.add(ambientLight);
-
-    const fogColor = new THREE.Color(0x2f2f2f); 
-    const fogNear = 0.3; 
-    const fogFar = 0.1; 
-    scene.fog = new THREE.Fog(fogColor, fogNear, fogFar);
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.z = 0.2;
@@ -116,10 +99,6 @@ const initScene = () => {
     loader.load('/models/montre.dae', onLoaded, onProgress, onError);
 };
 
-function onWindowResize(){
-    camera.updateProjectionMatrix();
-}
-
 const updateRendererSize = () => {
     renderer.setSize(width, height);
 };
@@ -153,22 +132,13 @@ const animate = () => {
     updateClockHands(); // Appel de la fonction pour mettre à jour les aiguilles
     renderer.render(scene, camera);
 };
-function setShadow(object,cast,receive) {
-    object.castShadow=cast;
-    object.receiveShadow=receive;
-    object.children.forEach(child => {
-      setShadow(child,cast,receive);
-    });
-  }
 
 function onLoaded(collada) {
     let objects = collada.scene;
     boitier_carre= objects.getObjectByName("boitier_carre");
     boitier_round= objects.getObjectByName("boitier_rond");
     bracelet = objects.getObjectByName("bracelet");
-    pierre  = objects.getObjectByName("pierre");
-    setShadow(boitier_carre,true,false);
-    setShadow(boitier_round,true,false);
+        pierre = objects.getObjectByName("pierre");
 
     textureBackground =  new THREE.TextureLoader().load(`/models/Texture/${Montres.boitier_image_url.value}`);
     textureBarcet =  new THREE.TextureLoader().load(`/models/Texture/${Montres.bracelet_image_url.value}`);
@@ -183,17 +153,6 @@ function onLoaded(collada) {
         boitier_round.visible = false;
     }    
 
-    let pierre2 = pierre.clone();
-    pierre2.position.y = 1;
-  
-    let pierre3 = pierre.clone();
-    pierre3.position.x -= 18.5;
-    pierre3.position.y -= 18.75;
-  
-    let pierre4 = pierre.clone();
-    pierre4.position.x += 18.5;
-    pierre4.position.y -= 18.75;
-
     objects.traverse((child) => {
         if (child.name === "aiguille_heures") {
             aiguilleHeures = child;
@@ -206,7 +165,7 @@ function onLoaded(collada) {
         }
     });
 
-    scene.add(objects, pierre3, pierre4);
+    scene.add(objects);
     let dt = clock.getElapsedTime();
     console.log("Loading completed after " + dt + " s.");
 }
@@ -227,8 +186,8 @@ const onClick = () => {
 };
 
 const onResize = () => {
-    width = Montre.value.clientWidth;
-    height = Montre.value.clientHeight;
+    width = test.value.clientWidth;
+    height = test.value.clientHeight;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     updateRendererSize();
@@ -240,8 +199,8 @@ const saveCameraPosition = () => {
 };
 
 onMounted(() => {
-    width = Montre.value.clientWidth;
-    height = Montre.value.clientHeight;
+    width = test.value.clientWidth;
+    height = test.value.clientHeight;
     initScene();
     animate();
     window.addEventListener('resize', onResize);
@@ -260,36 +219,55 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-    <div ref="Montre" >
-        <canvas class="canvas" ref="canvas" />
-    </div>
-</template>
-
+    <section>
+      <div class="Card">
+        <div ref="test" class="Card__Canvas">
+            <canvas class="canvas" ref="canvas" />
+        </div>
+        <div class="Card__Content">
+          <!-- <h2 class="Card__Title">{{ montre.nom }}</h2>
+          <p class="Card__Text">{{ montre.description }}</p> -->
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga placeat voluptate ipsa reiciendis enim magnam. Ipsa facere pariatur minus quibusdam nostrum! Non provident nostrum eum nesciunt pariatur, totam natus veritatis!</p>
+          <!-- Autres informations de la montre ici -->
+        </div>
+      </div>
+    </section>
+  </template>
+    
 <style lang="scss" scoped>
-.canvas {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    border: 0px solid $secondary-color;  
-}
-.Layout__Aside{
+  .Card {
+    display: flex;
     background: $black;
-    height: 100%;
     color: $white;
-    border-left: 3px solid $white; 
-    font-family: $primary-font-familly; 
-
-    &__Titre{
+    border: 3px solid $white;
+    // border-radius: $border-radius;
+    overflow: hidden;
+    // font-family: $primary-font-family;
+    margin-bottom: 2rem;
+  
+    &__Canvas {
+      flex: 1;
+      position: relative;
+    }
+  
+    &__Content {
+      flex: 1;
+      padding: 2rem;
+  
+      &__Title {
         font-size: $big-font-size;
         font-weight: 700;
         text-align: center;
-        padding: 1rem;
-    }
-    &__Texte{
+        margin-bottom: 1.5rem;
+      }
+  
+      &__Text {
         font-size: $medium-font-size;
         font-weight: 400;
         text-align: center;
-        padding: 1rem;
+        margin-bottom: 2rem;
+      }
     }
-}
-</style>
+  }
+  </style>
+  
