@@ -8,19 +8,16 @@
     <div class="layout__header__menu">
       <ul class="layout__header__menu__menuitem">
         <li class="layout__header__menu__menuitem__element">
-          <router-link to="/">Home</router-link>
+          <router-link to="/">Accueil</router-link>
         </li>
         <li class="layout__header__menu__menuitem__element">
-          <router-link to="/about">About</router-link>
+          <router-link to="/inspirations">Inspirations</router-link>
         </li>
         <li class="layout__header__menu__menuitem__element">
-          <router-link to="/contact">Contact</router-link>
+          <router-link to="/montre">Vos Montres</router-link>
         </li>
         <li class="layout__header__menu__menuitem__element">
-          <router-link class="layout__header__menu__menuitem__element__login" to="/login">Login</router-link>
-        </li>
-        <li class="layout__header__menu__menuitem__element">
-          <router-link class="layout__header__menu__menuitem__element" to="/cart"><MyIcon  class="layout__header__menu__menuitem__element__icon"/></router-link>
+          <router-link class="layout__header__menu__menuitem__element" to="/panier"><MyIcon  class="layout__header__menu__menuitem__element__icon"/></router-link>
         </li>
       </ul>
     </div>

@@ -1,75 +1,53 @@
 <script setup>
-import { ref, onMounted, onBeforeMount } from 'vue'
-import CanvasLayout from '@/components/layout/CanvaLayout.vue'
+import { ref, onBeforeMount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { instance } from '@/utils/axios'
-// import { getCadrans, getBracelets, getClocksById, delClock } from '@/utils/Donne.js'
+import { getClocksById, delClock, getboitiers, getPierres, getbracelet } from '@/utils/Donne.js'
+import CanvasLayout from '@/components/layout/CanvaLayout.vue'
+import DefaultLayout from '@/components/layouts/DefaultLayout.vue';
+
 const route = useRoute()
 const router = useRouter()
-const cadrans = ref()
-const bracelets = ref()
-const montre = ref()
-const newMontre = ref()
-const userId = ref()
-if (localStorage.getItem('userId')) {
-  userId.value = localStorage.getItem('userId')
-}
-onBeforeMount(async () => {
-  // const montre = ref()
-  // montre.value = await getClocksById(route.params.id)
-  console.log(montre.value)
-  const panierValue = ref()
-  if (montre.value.Panier) {
-    panierValue.value = true
-  } else {
-    panierValue.value = false
-  }
-  newMontre.value = {
-    boitier_form: montre.value.boitier_form,
-    cadran_name: montre.value.cadran,
-    bracelet_name: montre.value.bracelet,
-    // panier: panierValue.value
-  }
-})
+const getboitier = ref([])
+const getPierre = ref([])
+const getBracelets = ref([])
+const montre = ref({})
+const nouveauMontre = ref({})
+const userId = ref(localStorage.getItem('userId'))
 
-onMounted(async () => {
-  console.log(montre.value.user_id)
-  console.log(userId.value)
-  // cadrans.value = await getCadrans()
-  // bracelets.value = await getBracelets()
-//   cadrans.value.forEach((cadran) => {
-    // console.log("Cadran ",cadran.price)
-    // prixCadran.value.push(cadran.price)
-//   })
-  // console.log(prixCadran.value)
-//   bracelets.value.forEach((cadran) => {
-    // console.log("Bracelet ",cadran.price)
-    // prixBracelet.value.push(cadran.price)
-//   })
-  // console.log(prixBracelet.value)
+onBeforeMount(async () => {
+  getboitier.value = await getboitiers()
+  getPierre.value = await getPierres()
+  getBracelets.value = await getbracelet()
+  montre.value = await getClocksById(route.params.id)
+  nouveauMontre.value = {
+    id_Utilisateur: userId.value,
+    id_boitier: montre.value.id_boitier,
+    id_pierres: montre.value.id_pierres,
+    id_bracelet: montre.value.id_bracelet,
+    Boitiers_Form: montre.value.Boitiers_Form,
+  };
 })
 
 const updateMontre = async () => {
-  if (userId.value == montre.value.user_id) {
-      await instance.put(`/montre/update/${route.params.id}`, newMontre.value)
-      newMontre.value = {
-        panier: newMontre.value.panier,
-        boitier_form: newMontre.value.boitier_form,
-        cadran_name: newMontre.value.cadran_name,
-        bracelet_name: newMontre.value.bracelet_name
-      }
+  if (userId.value == montre.value.id_Utilisateur) {
+    // Vérifier si toutes les propriétés de nouveauMontre sont définies
+    if (Object.values(nouveauMontre.value).every(value => value !== undefined && value !== '')) {
+      await instance.put(`/Montres/edit/${route.params.id}`, nouveauMontre.value);
+      router.push('/Montre');
+    } else {
+      alert('Veuillez remplir tous les champs.');
+    }
   } else {
-    alert('Vous ne pouvez pas modifier cette montre.')
+    alert('Vous ne pouvez pas modifier cette montre.');
   }
-}
+};
 
 const deleteMontre = async () => {
-  console.log(userId.value)
-  console.log(montre.value.user_id)
-  if (userId.value == montre.value.user_id) {
-    if (confirm('Vous allez supprimé votre montre, voulez-vous continuer ?')) {
-      await instance.delete(`/montres/${route.params.id}/delete`)
-      router.push('/Montres')
+  if (userId.value == montre.value.id_Utilisateur) {
+    if (confirm('Vous allez supprimer votre montre, voulez-vous continuer ?')) {
+      await delClock(route.params.id)
+      router.push('/Montre')
     }
   } else {
     alert('Vous ne pouvez pas supprimer cette montre.')
@@ -78,45 +56,42 @@ const deleteMontre = async () => {
 </script>
 
 <template>
-  <div>
-    <RouterLink to="/"> Retour à l'accueil </RouterLink>
+  <DefaultLayout>
     <div>
       <h1>Page {{ route.params.id }}</h1>
     </div>
     <form @submit.prevent="updateMontre">
-      <input type="hidden" v-model="t" />
-      <select required v-model="newMontre.cadran_name">
-        <option
-          v-for="(cadran, index) in cadrans"
-          :value="cadran.texture"
-          :key="index"
-          :label="cadran.texture"
-        />
-      </select>
-      <select required v-model="newMontre.bracelet_name">
-        <option
-          v-for="(bracelet, index) in bracelets"
-          :value="bracelet.texture"
-          :key="index"
-          :label="bracelet.texture"
-        />
-      </select>
-      <select required v-model="newMontre.boitier_form">
-        <option value="carre" label="Carre" />
-        <option value="rond" label="Rond" />
-      </select>
-      <input type="checkbox" v-model="newMontre.panier" />
-
+      <div>
+        <label for="boitiers">Choisissez le boitiers</label>
+        <select name="boitiers" required v-model="nouveauMontre.id_boitier">
+          <option v-for="(boitier, index) in getboitier" :key="index" :label="boitier.nom_boitier" :value="boitier.boitier_image_url"></option>
+        </select>
+      </div>
+      <div>
+        <label for="pierre">Choisissez l'image de votre cadran</label>
+        <select name="pierre" v-model="nouveauMontre.id_pierres" id="">
+          <option v-for="(pierre, index) in getPierre" :key="index" :label="pierre.nom_pierres"  :value="pierre.nom_pierres"></option>
+        </select>
+      </div>
+      <div>
+        <label for="bracelet">Choisissez l'image de votre cadran</label>
+        <select name="bracelet" v-model="nouveauMontre.id_bracelet" id="">
+          <option v-for="(bracelet, index) in getBracelets" :key="index" :label="bracelet.nom_bracelet" :value="bracelet.bracelet_image_url"></option>
+        </select>
+      </div>
+      <div>
+        <label for="typeBoitier">Choisissez l'image de votre cadran</label>
+        <select name="typeBoitier" id="typeBoitier" v-model="nouveauMontre.Boitiers_Form">
+            <option value="rond" selected>Round</option>
+            <option value="carré">Carré</option>
+        </select>
+      </div>
       <button type="submit">Modifier</button>
     </form>
     <button @click="deleteMontre">Supprimer</button>
-    <CanvasLayout
-      :boitier_shape="newMontre.boitier_form"
-      :fond="newMontre.cadran_name"
-      :bracelet_tissu="newMontre.bracelet_name"
-    />
-  </div>
-  Lorem ipsum dolor sit amet consectetur adipisicing elit. A aliquam pariatur animi doloremque similique aperiam suscipit temporibus quod, eum exercitationem ea tempore saepe dolor asperiores cumque alias repellendus eveniet officia!
+    <CanvasLayout :boitier_image_url="nouveauMontre.id_boitier" :bracelet_image_url="nouveauMontre.id_bracelet" :Boitiers_Form="nouveauMontre.Boitiers_Form"/>
+    <router-link to="/Montre">Retour à l'accueil</router-link>
+  </DefaultLayout>
 </template>
 
 <style lang="scss"></style>

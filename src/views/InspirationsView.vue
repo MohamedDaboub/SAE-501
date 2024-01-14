@@ -92,11 +92,11 @@ onMounted(async () => {
 watchEffect(() => {
   updateFilteredMontres();
 });
-const { id } = req.params;
-const handleCardClick = (montre_id) => {
-  // Navigate to the details page with the montre_id as a parameter
-  router.push({ name: 'watch-details', params: { id: montre_id } });
+const handleCardClick = (id_Montre) => {
+  console.log('Clicked on card with ID:', id_Montre);
+  router.push({ name: 'watchdetails', params: { id: id_Montre } });
 };
+
 </script>
 
 <template>
@@ -104,7 +104,15 @@ const handleCardClick = (montre_id) => {
     <div class="">
       <div class="C-inspiration">      
         <h1 class="C-inspiration__titre">Liste des Montres</h1>
-        <p class="C-inspiration__texte">Lorem ipsum dolor sit amet consectetur adipisicing elit. Earum, ullam excepturi! Neque iure earum recusandae quae repellendus iste quod et soluta, hic, eaque eveniet natus ipsa tempora vero ex praesentium.</p>
+        <p class="C-inspiration__texte">
+      Bienvenue sur notre page dédiée à l'horlogerie, où le temps se transforme en une symphonie de style et d'ingéniosité. Chaque montre que vous découvrirez ici est plus qu'un simple instrument de mesure du temps ; c'est une œuvre d'art, une manifestation de l'artisanat et de la précision.
+    </p>
+    <p class="C-inspiration__texte">
+      Explorez notre collection soigneusement sélectionnée, où chaque montre raconte une histoire unique. Des designs élégants aux complications sophistiquées, chaque pièce incarne l'essence du temps qui passe, capturée dans un écrin de beauté. Que vous soyez un passionné d'horlogerie ou que vous cherchiez la montre parfaite, notre liste des montres est une source infinie d'inspiration.
+    </p>
+    <p class="C-inspiration__texte">
+      Chaque tic-tac est une invitation à célébrer le présent, à apprécier la minutie du travail artisanal et à embrasser le style intemporel. Nous vous invitons à parcourir notre sélection avec un œil curieux et un cœur ouvert. Que ces montres vous inspirent à gérer votre temps avec sagesse et à apprécier chaque instant de votre vie.
+    </p>
       </div>
       <div class="C-inspiration">
         <h2 class="C-inspiration__titreFilter">Filtres</h2>
@@ -118,7 +126,7 @@ const handleCardClick = (montre_id) => {
         </div>
       </div>
       <div class="C-inspiration__card">
-        <div v-for="montre in filteredMontres && filteredMontres.length ? filteredMontres.slice(getCardRange().startIndex, getCardRange().endIndex) : []" :key="montre.id_montre" class="C-inspiration__card__plus" @click="handleCardClick(montre.id_montre)">
+        <div v-for="montre in filteredMontres && filteredMontres.length ? filteredMontres.slice(getCardRange().startIndex, getCardRange().endIndex) : []" :key="montre.id_Montre" class="C-inspiration__card__plus" @click="handleCardClick(montre.id_Montre)">
         <MyCard :boitier_image_url="montre.id_boitier" :bracelet_image_url="montre.id_bracelet" :Boitiers_Form="montre.Boitiers_Form" />
         <div class="C-inspiration__card__des">
           <p class="C-inspiration__card__des__texte">{{ getBraceletTexture(montre.id_bracelet) }}</p>
@@ -141,9 +149,6 @@ const handleCardClick = (montre_id) => {
     </div>
   </DefaultLayout>
 </template>
-
-
-
 <style lang="scss" scoped>
 .C-inspiration{
   margin: rem(30) auto;
@@ -153,6 +158,11 @@ const handleCardClick = (montre_id) => {
     font-weight: 700;
     text-align: center;
     margin-bottom: rem(30);
+  }
+  &__texte{
+    font-size:$medium-font-size;
+    margin: rem(30);
+    line-height: 1.5;
   }
   &__titreFilter{
     font-size:$big-font-size;
