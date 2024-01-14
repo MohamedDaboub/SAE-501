@@ -35,11 +35,6 @@ const login = async () => {
     router.push('/');
     // Affiche la valeur de userId
     console.log('Identifiant utilisateur:', userId.value);
-
-    // Affiche les valeurs de Email_utilisateur et password
-    // console.log('Email de l\'utilisateur:', loginData.value.Email_utilisateur);
-    // console.log('Mot de passe de l\'utilisateur:', loginData.value.password);
-    // console.log('Connecté avec succès', response.data);
   } catch (error) {
     console.error('Erreur lors de la connexion :', error.message);
   }

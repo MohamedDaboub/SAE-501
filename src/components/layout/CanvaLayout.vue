@@ -260,7 +260,7 @@ onBeforeUnmount(() => {
 });
 </script>
 <template>
-    <div ref="Montre" >
+    <div ref="Montre"  class="canvas">
         <canvas class="canvas" ref="canvas" />
     </div>
 </template>
@@ -269,7 +269,6 @@ onBeforeUnmount(() => {
 .canvas {
     width: 100%;
     height: 100%;
-    margin: 0;
     border: 0px solid $secondary-color;  
 }
 .Layout__Aside{

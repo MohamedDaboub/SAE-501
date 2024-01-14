@@ -3,7 +3,7 @@ import { ref, onMounted, onBeforeMount } from 'vue'
 import CanvasLayout from '@/components/layout/CanvaLayout.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { instance } from '@/utils/axios'
-import { getCadrans, getBracelets, getClocksById, delClock } from '@/utils/Donne.js'
+// import { getCadrans, getBracelets, getClocksById, delClock } from '@/utils/Donne.js'
 const route = useRoute()
 const router = useRouter()
 const cadrans = ref()
@@ -16,7 +16,7 @@ if (localStorage.getItem('userId')) {
 }
 onBeforeMount(async () => {
   // const montre = ref()
-  montre.value = await getClocksById(route.params.id)
+  // montre.value = await getClocksById(route.params.id)
   console.log(montre.value)
   const panierValue = ref()
   if (montre.value.Panier) {
@@ -35,8 +35,8 @@ onBeforeMount(async () => {
 onMounted(async () => {
   console.log(montre.value.user_id)
   console.log(userId.value)
-  cadrans.value = await getCadrans()
-  bracelets.value = await getBracelets()
+  // cadrans.value = await getCadrans()
+  // bracelets.value = await getBracelets()
 //   cadrans.value.forEach((cadran) => {
     // console.log("Cadran ",cadran.price)
     // prixCadran.value.push(cadran.price)
@@ -116,6 +116,7 @@ const deleteMontre = async () => {
       :bracelet_tissu="newMontre.bracelet_name"
     />
   </div>
+  Lorem ipsum dolor sit amet consectetur adipisicing elit. A aliquam pariatur animi doloremque similique aperiam suscipit temporibus quod, eum exercitationem ea tempore saepe dolor asperiores cumque alias repellendus eveniet officia!
 </template>
 
 <style lang="scss"></style>

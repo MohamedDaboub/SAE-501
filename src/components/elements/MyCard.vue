@@ -1,11 +1,12 @@
 <script setup>
-  import { ref, onMounted, onBeforeUnmount, toRefs,onUpdated } from 'vue';  
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ColladaLoader } from 'three/examples/jsm/loaders/ColladaLoader.js';
+import { ref, onMounted, onBeforeUnmount, toRefs,onUpdated } from 'vue';
+import {instance } from "@/utils/axios.js";
 import * as THREE from 'three';
 
 const canvas = ref(null);
-const test = ref(null);
+const Montre = ref(null);
 var controls = null;
 var clock = new THREE.Clock();
 let scene = null;
@@ -22,7 +23,7 @@ let textureBarcet = null;
 let boitier_round = null;
 let boitier_carre = null;
 let bracelet = null;
-let pierre = null;
+let pierre
 
 const props = defineProps({
     Boitiers_Form :String,
@@ -34,10 +35,27 @@ const Montres = toRefs(props);
 
 const initScene = () => {
     scene = new THREE.Scene();
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.shadowMap.enabled=true; // activer la gestion des ombres
+    renderer.shadowMap.type=THREE.PCFShadowMap;
     
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(1, 1, 1).normalize();
+    scene.add(directionalLight);
+
+    renderer.setClearColor(0x222222,1);
+    window.addEventListener('resize', onWindowResize, false);
+
+
     // Adjust ambient light for a darker scene
-    const ambientLight = new THREE.AmbientLight(0xf0f0f0); // Dark gray
+    var ambientLight = new THREE.AmbientLight(0xf0f0f0);
     scene.add(ambientLight);
+
+    const fogColor = new THREE.Color(0x2f2f2f); 
+    const fogNear = 0.3; 
+    const fogFar = 0.05; 
+    scene.fog = new THREE.Fog(fogColor, fogNear, fogFar);
 
     camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.z = 0.2;
@@ -99,6 +117,10 @@ const initScene = () => {
     loader.load('/models/montre.dae', onLoaded, onProgress, onError);
 };
 
+function onWindowResize(){
+    camera.updateProjectionMatrix();
+}
+
 const updateRendererSize = () => {
     renderer.setSize(width, height);
 };
@@ -132,13 +154,22 @@ const animate = () => {
     updateClockHands(); // Appel de la fonction pour mettre à jour les aiguilles
     renderer.render(scene, camera);
 };
+function setShadow(object,cast,receive) {
+    object.castShadow=cast;
+    object.receiveShadow=receive;
+    object.children.forEach(child => {
+      setShadow(child,cast,receive);
+    });
+  }
 
 function onLoaded(collada) {
     let objects = collada.scene;
     boitier_carre= objects.getObjectByName("boitier_carre");
     boitier_round= objects.getObjectByName("boitier_rond");
     bracelet = objects.getObjectByName("bracelet");
-        pierre = objects.getObjectByName("pierre");
+    pierre  = objects.getObjectByName("pierre");
+    setShadow(boitier_carre,true,false);
+    setShadow(boitier_round,true,false);
 
     textureBackground =  new THREE.TextureLoader().load(`/models/Texture/${Montres.boitier_image_url.value}`);
     textureBarcet =  new THREE.TextureLoader().load(`/models/Texture/${Montres.bracelet_image_url.value}`);
@@ -153,6 +184,17 @@ function onLoaded(collada) {
         boitier_round.visible = false;
     }    
 
+    let pierre2 = pierre.clone();
+    pierre2.position.y = 1;
+  
+    let pierre3 = pierre.clone();
+    pierre3.position.x -= 18.5;
+    pierre3.position.y -= 18.75;
+  
+    let pierre4 = pierre.clone();
+    pierre4.position.x += 18.5;
+    pierre4.position.y -= 18.75;
+
     objects.traverse((child) => {
         if (child.name === "aiguille_heures") {
             aiguilleHeures = child;
@@ -165,7 +207,7 @@ function onLoaded(collada) {
         }
     });
 
-    scene.add(objects);
+    scene.add(objects, pierre3, pierre4);
     let dt = clock.getElapsedTime();
     console.log("Loading completed after " + dt + " s.");
 }
@@ -186,8 +228,8 @@ const onClick = () => {
 };
 
 const onResize = () => {
-    width = test.value.clientWidth;
-    height = test.value.clientHeight;
+    width = Montre.value.clientWidth;
+    height = Montre.value.clientHeight;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     updateRendererSize();
@@ -199,8 +241,8 @@ const saveCameraPosition = () => {
 };
 
 onMounted(() => {
-    width = test.value.clientWidth;
-    height = test.value.clientHeight;
+    width = Montre.value.clientWidth;
+    height = Montre.value.clientHeight;
     initScene();
     animate();
     window.addEventListener('resize', onResize);
@@ -217,57 +259,31 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', onResize);
     document.removeEventListener('click', onClick);
 });
+const getMontres = async () => {
+  const reponse = await instance.get("/Montres");
+  return reponse.data;
+};
+onMounted(async () => {
+  Montres.value = await getMontres();
+  console.log(Montres.value);
+});
+
 </script>
 <template>
     <section>
       <div class="Card">
-        <div ref="test" class="Card__Canvas">
+        <div ref="Montre" class="Card__Canvas">
             <canvas class="canvas" ref="canvas" />
-        </div>
-        <div class="Card__Content">
-          <!-- <h2 class="Card__Title">{{ montre.nom }}</h2>
-          <p class="Card__Text">{{ montre.description }}</p> -->
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga placeat voluptate ipsa reiciendis enim magnam. Ipsa facere pariatur minus quibusdam nostrum! Non provident nostrum eum nesciunt pariatur, totam natus veritatis!</p>
-          <!-- Autres informations de la montre ici -->
         </div>
       </div>
     </section>
   </template>
     
 <style lang="scss" scoped>
-  .Card {
-    display: flex;
-    background: $black;
-    color: $white;
-    border: 3px solid $white;
-    // border-radius: $border-radius;
-    overflow: hidden;
-    // font-family: $primary-font-family;
-    margin-bottom: 2rem;
-  
-    &__Canvas {
-      flex: 1;
-      position: relative;
-    }
-  
-    &__Content {
-      flex: 1;
-      padding: 2rem;
-  
-      &__Title {
-        font-size: $big-font-size;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 1.5rem;
-      }
-  
-      &__Text {
-        font-size: $medium-font-size;
-        font-weight: 400;
-        text-align: center;
-        margin-bottom: 2rem;
-      }
-    }
-  }
+.canvas{
+    width: 100%;
+    height: 100%;
+    border-radius: rem(10) rem(10) rem(0) rem(0);
+}
   </style>
   
