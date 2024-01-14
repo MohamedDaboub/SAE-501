@@ -26,6 +26,9 @@ export const getClocksByUserId = async(id) => {
 export const delClock = async(id) => {
   await instance.delete(`/Montres/${id}/delete`);
 }
+export const delClockInCart = async(id) => {
+  await instance.delete(`/Panier/${id}/delete`);
+}
 export const getClockInCart = async(userId) => {
     const response = await instance.get(`/Panier/${userId}`);
     return response.data
