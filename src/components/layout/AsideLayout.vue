@@ -3,6 +3,9 @@ import { ref, onMounted } from "vue";
 import {instance } from "@/utils/axios";
 import {getboitiers,getPierres,getbracelet } from "@/utils/Donne.js";
 import CanvasLayout from '@/components/layout/CanvaLayout.vue'
+import { useRouter } from 'vue-router';
+import Swal from 'sweetalert2';
+const router = useRouter();
 const getboitier = ref();
 const getPierre = ref();
 const getBracelets = ref();
@@ -21,16 +24,28 @@ onMounted(async () => {
 
 });
 
-const addMontre = async()=>{
-  await instance.post('Montres/add',nouveauMontre.value);
-  nouveauMontre.value = ({
-    id_Utilisateur:userId.value,
-    id_boitier:"background_black01.png",
-    id_pierres:"Aigue-marine",
-    id_bracelet:"texture-tissus-or.jpg",
-    Boitiers_Form:"rond",
-});
-}
+const addMontre = async () => {
+  await instance.post('Montres/add', nouveauMontre.value);
+
+  // Utiliser SweetAlert pour afficher un message
+  Swal.fire({
+    title: 'Montre ajoutée au panier!',
+    icon: 'success',
+    confirmButtonText: 'OK',
+  });
+
+  setTimeout(() => {
+    // router push to montre
+    router.push('/montre');
+  }, 2000);
+  nouveauMontre.value = {
+    id_Utilisateur: userId.value,
+    id_boitier: "background_black01.png",
+    id_pierres: "Aigue-marine",
+    id_bracelet: "texture-tissus-or.jpg",
+    Boitiers_Form: "rond",
+  };
+};
 if (localStorage.getItem('userId')) {
   userId.value = localStorage.getItem('userId');
   nouveauMontre.value = ({
@@ -79,7 +94,7 @@ if (localStorage.getItem('userId')) {
                     <option value="carré">Carré</option>
                 </select>
             </div>
-            <button type="submit">Ajouter</button>
+            <button type="submit">Ajouter au Panier</button>
         </form>
     </div>
   </section>
