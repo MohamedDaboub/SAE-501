@@ -4,6 +4,8 @@ import MyCard from '@/components/elements/MyCard.vue'
 import { instance } from '@/utils/axios'
 import {getboitiers,getPierres,getbracelet } from "@/utils/Donne.js";
 import { ref, onMounted,watchEffect  } from "vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
 const budgetMin = ref(0);
 const budgetMax = ref(300);
@@ -90,6 +92,11 @@ onMounted(async () => {
 watchEffect(() => {
   updateFilteredMontres();
 });
+const { id } = req.params;
+const handleCardClick = (montre_id) => {
+  // Navigate to the details page with the montre_id as a parameter
+  router.push({ name: 'watch-details', params: { id: montre_id } });
+};
 </script>
 
 <template>
@@ -111,7 +118,7 @@ watchEffect(() => {
         </div>
       </div>
       <div class="C-inspiration__card">
-        <div v-for="montre in filteredMontres && filteredMontres.length ? filteredMontres.slice(getCardRange().startIndex, getCardRange().endIndex) : []" :key="montre.id_montre" class="C-inspiration__card__plus">
+        <div v-for="montre in filteredMontres && filteredMontres.length ? filteredMontres.slice(getCardRange().startIndex, getCardRange().endIndex) : []" :key="montre.id_montre" class="C-inspiration__card__plus" @click="handleCardClick(montre.id_montre)">
         <MyCard :boitier_image_url="montre.id_boitier" :bracelet_image_url="montre.id_bracelet" :Boitiers_Form="montre.Boitiers_Form" />
         <div class="C-inspiration__card__des">
           <p class="C-inspiration__card__des__texte">{{ getBraceletTexture(montre.id_bracelet) }}</p>
